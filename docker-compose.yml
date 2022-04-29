@@ -1,0 +1,26 @@
+version: '3.7'
+
+networks:
+  traefik:
+    external: true
+
+
+services:
+  aebransdotbe:
+    container_name: aebransdotbe
+    image: nginx:alpine
+    restart: always
+    volumes:
+      - ./site:/usr/share/nginx/html
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.aebransdotbe.rule=Host(`autoelektrobrans.be`) || Host(`www.autoelektrobrans.be`)"
+      - "traefik.http.routers.aebransdotbe.entrypoints=web,websecure"
+      - "traefik.http.services.aebransdotbe.loadbalancer.server.port=80"
+      - "traefik.http.routers.aebransdotbe.tls=true"
+      - "traefik.http.routers.aebransdotbe.tls.certresolver=myresolver"
+      # Set "Strict-Transport-Security" HTTP header for enhanced security
+      - "traefik.http.middlewares.sts_headers.headers.stsSeconds=15552000"
+      - "traefik.http.middlewares.sts_headers.headers.stsIncludeSubdomains=True"
+    networks:
+      - traefik
